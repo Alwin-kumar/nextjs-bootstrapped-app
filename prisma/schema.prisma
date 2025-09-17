@@ -1,0 +1,110 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String   @unique
+  firstName String?
+  lastName  String?
+  imageUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  resumes      Resume[]
+  certificates Certificate[]
+
+  @@map("users")
+}
+
+model Resume {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String   @default("My Resume")
+  
+  // Personal Information
+  fullName    String
+  email       String
+  phone       String?
+  address     String?
+  website     String?
+  linkedin    String?
+  github      String?
+  
+  // Professional Summary
+  summary     String?
+  
+  // Experience (JSON array)
+  experience  Json?
+  
+  // Education (JSON array)
+  education   Json?
+  
+  // Skills (JSON array)
+  skills      Json?
+  
+  // Projects (JSON array)
+  projects    Json?
+  
+  // Additional sections (JSON)
+  additional  Json?
+  
+  // AI Improvements
+  aiImproved  Boolean  @default(false)
+  originalContent Json?
+  
+  // ATS Score
+  atsScore    Int?
+  atsAnalysis Json?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("resumes")
+}
+
+model Certificate {
+  id               String   @id @default(cuid())
+  userId           String
+  
+  // Certificate Details
+  name             String
+  issuingOrganization String
+  issueDate        DateTime
+  expirationDate   DateTime?
+  credentialId     String?
+  credentialUrl    String?
+  
+  // Document Upload
+  documentUrl      String?
+  documentType     String? // 'image' or 'pdf'
+  
+  // AI Verification
+  isVerified       Boolean  @default(false)
+  verificationStatus String @default("pending") // 'pending', 'verified', 'rejected', 'error'
+  verificationDetails Json?
+  
+  // Skills/Tags
+  skills           Json?
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("certificates")
+}
